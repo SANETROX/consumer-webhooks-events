@@ -34,18 +34,24 @@ def callback(ch, method, properties, body):
     collection = db['events']
     data = json.loads(body)
     data = data.get('data_event')
+    app_info = data.get('app_info')
+    type_event = data.get('type_event')
+    print("APP_INFO: ",app_info)
     data['idOrder'] = data.pop('_id')
     collection.insert_one(data)
     print(data)
     sys.stdout.flush()
 
-    response = requests.post('https://webhook.site/257ce8ec-3b1c-47ef-9e16-00c4b7144b48',data=loads(dumps(data)))
-    if response.status_code == 200:
-        print('Request successful!')
-        sys.stdout.flush()
-    else:
-        print('Request failed!')
-        sys.stdout.flush()
+    if app_info and type_event:
+        for webhook in app_info.get(webhooks):
+            if webhook.get('event_name') == type_event:
+                response = requests.post(webhook.get('target_url'),data=loads(dumps(data)))
+                if response.status_code == 200:
+                    print('Request successful!')
+                    sys.stdout.flush()
+                else:
+                    print('Request failed!')
+                    sys.stdout.flush()
     
 
 
