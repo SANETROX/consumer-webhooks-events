@@ -33,6 +33,7 @@ def callback(ch, method, properties, body):
     sys.stdout.flush()
     collection = db['events']
     data = json.loads(body)
+    data = data.get('data_event')
     data['idOrder'] = data.pop('_id')
     collection.insert_one(data)
     print(data)
