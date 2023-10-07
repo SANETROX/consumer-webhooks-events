@@ -43,16 +43,19 @@ def callback(ch, method, properties, body):
     sys.stdout.flush()
 
     if app_info and type_event:
-        for webhook in app_info.get(webhooks):
+        for webhook in app_info.get('webhooks'):
             if webhook.get('event_name') == type_event:
-                response = requests.post(webhook.get('target_url'),data=loads(dumps(data)))
-                if response.status_code == 200:
-                    print('Request successful!')
-                    sys.stdout.flush()
-                else:
-                    print('Request failed!')
-                    sys.stdout.flush()
-    
+                try:
+                    response = requests.post(webhook.get('target_url'),data=loads(dumps(data)))
+                    if response.status_code == 200:
+                        print('Request successful!')
+                        sys.stdout.flush()
+                    else:
+                        print('Request failed!')
+                        sys.stdout.flush()
+                except Exception as e:
+                    print("ERROR ENVIANDO WEBHOOK", e.args)
+                    continue
 
 
 try: 
