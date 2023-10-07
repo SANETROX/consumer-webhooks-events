@@ -1,6 +1,8 @@
 import pika, json, ssl, sys
 import pymongo
 from pymongo import MongoClient
+import requests
+from bson.json_util import dumps, loads
 
 try:
     mongo_client = MongoClient('mongodb://mongo:tBhJm2OF7QtOPG5zND34@containers-us-west-119.railway.app:5610')
@@ -24,6 +26,8 @@ parameters = pika.ConnectionParameters(host='b-1ba484aa-4d38-453d-9e5b-bcc42a51a
                                        ssl_options=pika.SSLOptions(context)
                                        )
 
+
+
 def callback(ch, method, properties, body):
     print('Received in admin')
     sys.stdout.flush()
@@ -33,6 +37,15 @@ def callback(ch, method, properties, body):
     collection.insert_one(data)
     print(data)
     sys.stdout.flush()
+
+    response = requests.post('https://webhook.site/257ce8ec-3b1c-47ef-9e16-00c4b7144b48',data=loads(dumps(data)))
+    if response.status_code == 200:
+        print('Request successful!')
+        sys.stdout.flush()
+    else:
+        print('Request failed!')
+        sys.stdout.flush()
+    
 
 
 try: 
